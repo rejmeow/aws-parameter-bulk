@@ -1,0 +1,61 @@
+env:
+  - GO111MODULE=on
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+builds:
+  - binary: aws-parameter-bulk
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm
+      - arm64
+    goarm:
+      - "6"
+      - "7"
+    ignore:
+      - goos: darwin
+        goarch: "386"
+      - goos: windows
+        goarch: arm
+      - goos: windows
+        goarch: arm64
+    main: ./main/main.go
+archives:
+  - format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - LICENSE
+      - README.md
+      - ui/*
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+
+universal_binaries:
+  - replace: true
+
+brews:
+  -
+    name: aws-parameter-bulk
+    homepage: "https://github.com/skinnyheat/aws-parameter-bulk"
+    repository:
+      owner: gork74
+      name: homebrew-gork74
+    commit_author:
+      name: Adam Malik
+      email: work@adam-malik.de
